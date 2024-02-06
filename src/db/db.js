@@ -8,6 +8,7 @@ const connectDB = async()=>{
         console.log(`Mongodb connection hoi gol:  ${Instance.connection.host}`);
     } catch (error) {
         console.error(`CONNECTION HUWA NAI SET :${error}`);
+        // process from node
         process.exit(1);
     }
 };
