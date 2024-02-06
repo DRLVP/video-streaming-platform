@@ -12,14 +12,16 @@ dotenv.config({
 
 connectDB()
 .then(()=>{
-    app.listen(process.env.PORT || 8000, ()=>{
-        console.log("Server started on port "+ (process.env.PORT || 8000));
+    app.listen(process.env.PORT || 3000, ()=>{
+        console.log(`server is running at http://localhost:${process.env.PORT}`);
+    });
+    app.on('error', (err)=>{
+        console.log(`Database connect koribo nuwarilu ${err}`);
     })
 })
-.catch((err)=>{
-    console.error("MONGODB  ERROR", err);
-    process.exit(1);
-});
+.catch((error)=>{
+    console.log(`mongoDB connection failed ${error}`);
+})
 
 
 
