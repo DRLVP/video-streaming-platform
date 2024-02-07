@@ -2,7 +2,6 @@ import express from "express"
 import cookieParser from "cookie-parser";
 import cors from "cors"
 
-
 // url or pora jatiai data ahe besibhg khetrote req.params or joriote ahe
 const app = express();
 // cors configuration app.use methodot middleware set kora hoi
@@ -20,6 +19,14 @@ app.use(express.static("public"));
 
 // set cookies in browser
 app.use(cookieParser());
+
+
+
+// import all routes
+import userRouter from "./routes/user.routes.js"
+
+// routes declaration with industry standard
+app.use("/api/v1/users", userRouter)
 
 //export the app
 export {app};
