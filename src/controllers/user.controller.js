@@ -38,10 +38,11 @@ const registerUser = asyncHandler(async (req, res)=>{
         throw new ApiError(409, "user is already registered");
     }
     // step 4 - avater tu multeror joriote amr serverot valdore upload hol nai jodi valdore upload hol tente iyak cloudinaryt upload kori dim nohole error dim
+    console.log("Aikhini hoise request.files::: ",req.files);
     const avatarLocalPath = req.files?.avatar[0]?.path;
     // const coverImageLocalPath = req.files?.coverImage[0]?.path;
     if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar is required");
+        throw new ApiError(400, "Avatar tu diboi lagibo set");
     }
     let coverImageLocalPath;
     if (res.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
@@ -53,7 +54,7 @@ const registerUser = asyncHandler(async (req, res)=>{
     const avatar = await uploadCloudinary(avatarLocalPath);
     const coverImage =await uploadCloudinary(coverImageLocalPath);
     if (!avatar) {
-        throw new ApiError(400, "Avatar is required");
+        throw new ApiError(400, "Avatar tu lagiboi bal kela");
     }
 
     //step 5 - hokolu data databaseot enter korim .
@@ -83,11 +84,11 @@ const registerUser = asyncHandler(async (req, res)=>{
 
 
 // create login user method
-const loginUser = asyncHandler(async ()=>{
+const loginUser = asyncHandler(async (req, res)=>{
     // get data from request body
     const { email, password, username }= req.body;
     // validate user using email or username
-    if (!email || !password) {
+    if (!(email || username)) {
         throw new ApiError(400, "email or username is required");
     }
     // find the user
