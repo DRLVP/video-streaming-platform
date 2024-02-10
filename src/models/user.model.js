@@ -2,6 +2,7 @@ import mongoose, {Schema} from "mongoose";
 // jwt ata bearer token mane ee jar usorot thak take ami malik buli kom mane ee ata sabir dore .
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt" ;
+// import { ApiError } from "../utils/apiError.js";
 
 const userSchema = new Schema({
     username:{
@@ -67,29 +68,31 @@ userSchema.methods.isPasswordCorrct = async function(password){
     return await bcrypt.compare(password, this.password);
 }
 // create Access token using jwt
-userSchema.methods.generateAccessToken = function(){
-    // generate token
-   return jwt.sign(
-    {
-        _id:this._id, // from the database
-        email:this.email,
-        username:this.username,
-        fullname:this.fullname
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    {expiresIn: process.env.ACCESS_TOKEN_EXPIRY},
-    )
-}
-
-// create Refresh token using jwt
-userSchema.methods.generateRefreshToken = function(){
-    return jwt.sign(
-        {
-            _id:this._id // from the database
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {expiresIn: process.env.REFRESH_TOKEN_EXPIRY},
+userSchema.methods.generateAccessToken =  function () {
+        return jwt.sign(
+            {
+                _id:this._id,
+                email:this.email,
+                username:this.username,
+                fullname:this.fullname
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                expiresIn: "1d"
+            }
         )
 }
-
+   
+// create Refresh token using jwt
+userSchema.methods.generateRefreshToken = function(){
+        return jwt.sign(
+            {
+                _id : this._id,
+            },
+            process.env.REFRESH_TOKEN_SECRET,
+            {
+                expiresIn:"10d"
+            }
+        )
+}
 export const User = mongoose.model("User", userSchema);

@@ -10,9 +10,9 @@ app.use(cors({
     credentials:true
 }));
 
-app.use(express.json({limit:"16kb"}))
+app.use(express.json({limit:"20kb"}))
 //get data from url with special character
-app.use(express.urlencoded({extended:true, limit:"16kb"}))
+app.use(express.urlencoded({extended:true, limit:"20kb"}))
 // use data from static folder
 app.use(express.static("public"));
 

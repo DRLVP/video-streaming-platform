@@ -5,16 +5,18 @@ import {uploadCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 
 // create generate access and refresh token method
-const generateAccessAndRefreshToken = async (userId)=>{
+const generateAccessAndRefreshTokens = async (userId)=>{
     try {
         const user = await User.findById(userId);
-        const accesstoken= User.generateAccessToken(userId);
-        const refreshtoken=User.generateRefreshToken(userId);  
+
+        const accessToken=  user.generateAccessToken();
+        const refreshToken= user.generateRefreshToken()  
         
-        user.refreshToken = refreshtoken;
+        
+        user.refreshToken = refreshToken;
         await user.save({validateBeforeSave:false})
     
-        return {accesstoken, refreshtoken}
+        return {accessToken, refreshToken};
     } catch (error) {
         return new ApiError(401, "error in generate access and refresh token", error);
     }
@@ -106,23 +108,29 @@ const loginUser = asyncHandler(async (req, res)=>{
         throw new ApiError(401, "incorrect password");
     }
     // send access and refresh token
-    const {accesstoken, refreshtoken}=await generateAccessAndRefreshToken(user._id);
-
-    // update refresh token because user token is empty
-    user.refreshToken = refreshtoken;
+    const {accessToken, refreshToken}= await generateAccessAndRefreshTokens(user._id);
+    console.log("This is your access token:: ", accessToken);
+    console.log("This is your refresh token:: ", refreshToken);
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
     // send cookie with options // return response
     const options = {
         httpOnly:true,
         secure:true
     }
-    return res.status(200).cookie("accessToken", accesstoken, options).cookie("refreshtoken", refreshtoken, options).json(
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
         // save the user in the cookies
         new ApiResponse(
             200,
             {
-                user: user, accesstoken, refreshtoken
+                user: loggedInUser, accessToken, refreshToken
             },
-            'successfully logged in',
+            accessToken,
+            refreshToken,
+            'successfully logged in hoi gol kela',
         )
     )
 
