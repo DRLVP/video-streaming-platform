@@ -64,7 +64,7 @@ userSchema.pre("save", async function(next){
 });
 
 // Atia ami password tu encrypt kori tu save korilu kintu jatia usere login korute password dibo tatia kana k ami gom pam j agor password tu ai hoi haikarone ami atia ata nijor METHOD bonam jiye naki usere atia dia password ru ami encrypt kori save kora password tu compare koribo ru amk returnot true & false answer dibo.
-userSchema.methods.isPasswordCorrct = async function(password){
+userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password);
 }
 // create Access token using jwt
