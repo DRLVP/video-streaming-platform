@@ -250,7 +250,7 @@ const getCurrentUser = asyncHandler(async(req, res)=>{
 
 
 // create update Account Details method
-const updateAccountDetails = asyncHandler(async()=>{
+const updateAccountDetails = asyncHandler(async(req, res)=>{
     const {fullname, email} = req.body;
 
     if (!(fullname || email)) {
@@ -278,6 +278,76 @@ const updateAccountDetails = asyncHandler(async()=>{
 })
 
 
+// create files update method
+const updateUserAvatar = asyncHandler(async(req, res)=>
+{
+    let avatarLocalPath = req.file?.path;
+
+    if (!avatarLocalPath) {
+        throw new ApiError(400, "Avatar file is missing")
+    }
+
+    const avatar = await uploadCloudinary(avatarLocalPath);
+    if (!avatar.url) {
+        throw new ApiError(400, "Error while updating avatar")
+    }
+
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                avatar: avatar.url
+            }
+        },
+        {new:true}
+    ).select("-password")
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {},
+            "avatar update successfully"
+            )
+    )
+}) 
+
+// create files update cover image method
+const updateUserCoverImage = asyncHandler(async(req, res)=>
+{
+    let coverImageLocalPath = req.file?.path;
+
+    if (!coverImageLocalPath) {
+        throw new ApiError(400, "cover image file is missing")
+    }
+
+    const coverImage = await uploadCloudinary(coverImageLocalPath);
+    if (!coverImage.url) {
+        throw new ApiError(400, "Error while updating cover image")
+    }
+
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                avatar: coverImage.url
+            }
+        },
+        {new:true}
+    ).select("-password")
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {},
+            "cover image update successfully"
+            )
+    )
+}) 
+
 export {
     registerUser, 
     loginUser, 
@@ -285,5 +355,7 @@ export {
     refreshAccessToken, 
     changeCurrentPassword, 
     getCurrentUser, 
-    updateAccountDetails
+    updateAccountDetails,
+    updateUserAvatar,
+    updateUserCoverImage
 };
