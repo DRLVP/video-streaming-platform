@@ -104,7 +104,7 @@ const loginUser = asyncHandler(async (req, res)=>{
         throw new ApiError(401, "user not exists");
     }
     // check password using myuser
-    const isPasswordValid = await user.isPasswordCorrct(password)
+    const isPasswordValid = await user.isPasswordCorrect(password)
     // if password is valid then go to next middleware otherwise show an error
     if(!isPasswordValid){
         throw new ApiError(401, "incorrect password");
@@ -224,7 +224,7 @@ const changeCurrentPassword = asyncHandler(async(req, res)=>
 
     const user = await User.findById(req.user?._id)
     // check old password correct or not
-    const isPasswordCorrect = await user.isPasswordCorrct(oldPassword);
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Old password is incorrect")
@@ -246,13 +246,19 @@ const changeCurrentPassword = asyncHandler(async(req, res)=>
 const getCurrentUser = asyncHandler(async(req, res)=>{
     return res
     .status(200)
-    .json(200, req.user, "current user fetched successfully")
+    .json(
+        new ApiResponse(
+            200, 
+            req.user, 
+            "current user fetched successfully"
+        )
+    )
 })
 
 
 // create update Account Details method
 const updateAccountDetails = asyncHandler(async(req, res)=>{
-    const {fullname, email} = req.body;
+    const {fullname, email, username} = req.body;
 
     if (!(fullname || email)) {
         throw new ApiError(400, "all field are required")
@@ -263,7 +269,8 @@ const updateAccountDetails = asyncHandler(async(req, res)=>{
         {
             $set:{
                 fullname,
-                email
+                email,
+                username
             }
         },
         {
