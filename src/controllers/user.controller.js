@@ -28,7 +28,7 @@ const generateAccessAndRefreshTokens = async (userId)=>{
 const registerUser = asyncHandler(async (req, res)=>{
     // step 1 - front-endor pora useror data bur lom
     const {fullname, username,email, password} = req.body;
-    console.log(req.body);
+    
     // step 2 - tar pasot hokolu data validate korim jate jodi kunuba ata required field khali thaki goise naki . jodi khali ase tente error message dim
     if ([fullname, username, email, password].some((field)=>field?.trim()==="")) {
         throw new ApiError(400, "this field is required")
@@ -42,21 +42,21 @@ const registerUser = asyncHandler(async (req, res)=>{
         throw new ApiError(409, "user is already registered");
     }
     // step 4 - avater tu multeror joriote amr serverot valdore upload hol nai jodi valdore upload hol tente iyak cloudinaryt upload kori dim nohole error dim
-    console.log("Aikhini hoise request.files::: ",req.files);
+
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    // const coverImageLocalPath = req.files?.coverImage[0]?.path;
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar tu diboi lagibo set");
     }
+    // if (!coverImageLocalPath) {
+        //     throw new ApiError(400, "cover image tu diboi lagibo set");
+        // }
     let coverImageLocalPath;
-    if (res.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverImageLocalPath = req.files.coverImage[0].path;
     }
-
-    console.log(req.files);
     // upload files in cloudinary
     const avatar = await uploadCloudinary(avatarLocalPath);
-    const coverImage =await uploadCloudinary(coverImageLocalPath);
+    const coverImage = await uploadCloudinary(coverImageLocalPath);
     if (!avatar) {
         throw new ApiError(400, "Avatar tu lagiboi bal kela");
     }
@@ -68,7 +68,7 @@ const registerUser = asyncHandler(async (req, res)=>{
         email,
         password,
         avatar:avatar.url,
-        coverImage:coverImage?.url||"",
+        coverImage:coverImage?.url || ""
     })
     
     // step 6 - databaseot enter huwar pasot jitu response ahibo tar pora password aru referesh token remove kori dim
@@ -299,7 +299,6 @@ const updateUserAvatar = asyncHandler(async(req, res)=>
     if (!avatar.url) {
         throw new ApiError(400, "Error while updating avatar")
     }
-
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -339,7 +338,7 @@ const updateUserCoverImage = asyncHandler(async(req, res)=>
         req.user._id,
         {
             $set:{
-                avatar: coverImage.url
+                coverImage: coverImage.url
             }
         },
         {new:true}
@@ -436,7 +435,8 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
 
 // write watch history controllers || pipelines
 const getWatchHistory = asyncHandler(async(req, res)=>{
-    const user = User.aggregate([
+    console.log("req.userot ahise::",req.user);
+    const user = await User.aggregate([
         // filter by user id
         {
             $match :{ 
@@ -447,7 +447,7 @@ const getWatchHistory = asyncHandler(async(req, res)=>{
         {
             $lookup:{
                 from:"videos",
-                localField:"watchedHistory",
+                localField:"watchHistory",
                 foreignField:"_id",
                 as:"watchHistory",
                 // write owner pipeline
@@ -461,6 +461,7 @@ const getWatchHistory = asyncHandler(async(req, res)=>{
                             pipeline:[
                                 {
                                     "$project":{
+                                        fullname:1,
                                         username:1,
                                         avatar:1
                                     }
