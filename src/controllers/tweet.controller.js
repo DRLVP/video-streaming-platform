@@ -36,6 +36,7 @@ const getUserTweets = asyncHandler(async(req, res)=>{
     // get user id 
     const {userId} = req.params;
     // check userid valid or not
+    console.log("aitu hol userId::==", userId);
     if(!isValidObjectId(userId)) {
         throw new ApiError(400,"Invalid User Id")
     }
@@ -53,7 +54,7 @@ const getUserTweets = asyncHandler(async(req, res)=>{
                 pipeline:[
                     {
                         $project:{
-                            username:1,
+                            "username":1,
                             "avatar.url" :1
                         }
                     }
@@ -91,10 +92,11 @@ const getUserTweets = asyncHandler(async(req, res)=>{
                 content:1,
                 ownerDetails:1,
                 likes:1,
+                createdAt:1
             }
         }
     ]);
-
+    console.log("hokolu khini tweets", tweets);
     if (!tweets) {
         throw new ApiError(500, "error fetching tweets");
     }
