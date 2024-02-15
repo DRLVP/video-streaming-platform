@@ -12,17 +12,18 @@ const createTweet = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "content is required");
     }
     // create tweet
-    const tweet = await Tweet.create(
+    const tweet = await Tweet.create({
         content, 
-        req?.user?._id
-    )
+        owner:req?.user?._id
+    })
+    console.log("aitu kela tur tweet::", tweet);
     if (!tweet) {
         throw new ApiError(500, "internal server error!! please retry");
     }
 
     return res.status(200)
     .json(
-        new apiResponse(
+        new ApiResponse(
             200, 
             tweet, 
             "tweet create successfully"

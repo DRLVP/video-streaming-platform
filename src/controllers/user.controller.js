@@ -389,7 +389,6 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
                 as:"subscribedTO"
             }
         },
-
         // add new fields
         {
             $addFields:{
@@ -417,7 +416,8 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
                 channelSubscribedCount:1,
                 avatar:1,
                 coverImage:1,
-                createdAt:1
+                createdAt:1,
+                watchHistory:1,
             }
         }
     ]);
@@ -429,7 +429,7 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
 
     return res.status(200)
     .json(
-        new ApiError(200, channel[0], "user channel get successfully")
+        new ApiResponse(200, channel[0], "user channel get successfully")
     )
 })
 
